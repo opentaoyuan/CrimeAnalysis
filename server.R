@@ -12,9 +12,9 @@ shinyServer(function(input, output) {
   
   
   output$map <- renderPlot({
-    ym <- as.numeric(input$map_year)
-    y1 <- round(ym / 100)
-    m1 <- ym %% 100
+    ym <- as.numeric(input$map_year) #轉換為numeric
+    y1 <- round(ym / 100) #取前3個數字
+    m1 <- ym %% 100 #取後2個數字
     if(input$map_breau == "All" & input$map_type == "All"){
       fdata <- data %>%
         filter(year == y1,month == m1)
@@ -30,14 +30,14 @@ shinyServer(function(input, output) {
       }#過濾地圖資料
     
       getmap <- get_googlemap(center = c(lon = mean(fdata$lon),lat = mean(fdata$lat)),zoom=zoom(),maptype = "roadmap")
-      #根據點位中心
+      #根據點位中心取得地圖
       ggmap(getmap,extent = "device",ylab = "lat",xlab = "lon",maprange=FALSE) +
         geom_point(data = fdata,colour = "darkred", pch=16, cex= 2.5,alpha = 1) +
         stat_density2d(data = fdata, aes(x = lon, y = lat,  fill = ..level.., alpha = ..level..),size = 0.01, geom = 'polygon')+
         scale_fill_gradient(low = "green", high = "red") +
         scale_alpha(range = c(0.05, 0.15))  +
         theme(legend.position = "none") 
-      })
+      })#根據取得的地圖畫出地圖內的點跟密度
   
   breau_plot <- reactive({
     ym <- as.numeric(input$anb_year)
@@ -49,9 +49,8 @@ shinyServer(function(input, output) {
       summarise(count = n()) %>%
       ggvis(~breau,~count) %>%
       layer_bars(fill = ~type,width = 0.5) 
-  })
-  
-  breau_plot %>% bind_shiny("breau_plot")
+  })#堆疊直方圖
+    breau_plot %>% bind_shiny("breau_plot")
   
   output$Data <- renderTable({
     ym <- as.numeric(input$data_year)
@@ -66,6 +65,5 @@ shinyServer(function(input, output) {
     }else{
       data %>% filter(year == y1,month == m1)
     }
-  })
-
+  })#資料檢視過濾
 })
