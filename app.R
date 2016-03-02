@@ -22,7 +22,7 @@ ui <- shinyUI(fluidPage(
   h3("Datarange:104/11~105/1", style = "color:red"),
   downloadButton('downloadData', 'Download'),
   br(),
-  span("last update:105/3/2", style = "color:blue"),
+  span("last update:105/2/5", style = "color:blue"),
   mainPanel(
     tabsetPanel(type = "tabs",
                 tabPanel("竊盜熱點",
@@ -45,6 +45,7 @@ ui <- shinyUI(fluidPage(
                            column(3,
                                   selectInput("anb_year", label = h4("年度"),c(10411,10412,10501)),      
                                   span("Design by TYPD", style = "color:darkorange")
+                                  
                            ),
                            column(3,
                                   h3("轄區竊盜件數堆疊直方圖"),
@@ -59,8 +60,7 @@ ui <- shinyUI(fluidPage(
                                   selectInput("data_breau", label = h4("分局"),
                                               c("All","桃園分局","中壢分局","楊梅分局","大園分局","大溪分局","平鎮分局","八德分局","龜山分局","蘆竹分局","龍潭分局")),
                                   selectInput("data_year", label = h4("年度"),c(10411,10412,10501)),      
-                                  span("Design by TYPD", style = "color:darkorange"),
-                                
+                                  span("Design by TYPD", style = "color:darkorange")
                            ),
                            column(6,
                                   h3("資料檢視"),
