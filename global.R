@@ -1,8 +1,0 @@
-library(shiny)
-library(ggvis)
-library(ggmap)
-library(dplyr)
-library(RgoogleMaps)
-library(ggplot2)
-library(RColorBrewer)
-data <- read.csv("http://jasonga778.myweb.hinet.net/lin/Taoyuan_crime.csv",fileEncoding = "utf8")
