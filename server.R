@@ -1,43 +1,36 @@
 shinyServer(function(input, output) {
-  output$Data <- renderTable({
-    if(input$data_breau != "All" & input$data_type != "All"){
-      data %>% filter(year == input$data_year,month == input$data_month,breau == input$data_breau,type == input$data_type)
-    }else if(input$data_breau !="All" & input$data_type == "All"){
-      data %>% filter(year == input$data_year,month == input$data_month,breau == input$data_breau)
-    }else if(input$data_breau =="All" & input$data_type != "All"){
-      data %>% filter(year == input$data_year,month == input$data_month,type == input$data_type)
-    }else{
-      data %>% filter(year == input$data_year,month == input$data_month)
-    }
-  })
 
   output$downloadData <- downloadHandler(
     filename = function() { paste('Taoyuan_crime', '.csv') },
     content = function(file) {
-      write.csv(data, file)
-    })
+      write.csv(data, file,row.names = F,fileEncoding = "utf8")
+    })#下載資料功能
 
   zoom <- reactive({
     input$map_zoom
-  })
+  })#地圖縮放
   
   
   output$map <- renderPlot({
+    ym <- as.numeric(input$map_year)
+    y1 <- round(ym / 100)
+    m1 <- ym %% 100
     if(input$map_breau == "All" & input$map_type == "All"){
       fdata <- data %>%
-        filter(year == input$map_year,month == input$map_month)
+        filter(year == y1,month == m1)
     }else if(input$map_breau == "All" & input$map_type != "All"){
       fdata <- data %>%
-        filter(year == input$map_year,month == input$map_month,type == input$map_type)
+        filter(year == y1,month == m1,type == input$map_type)
     }else if (input$map_breau != "All" & input$map_type == "All"){
       fdata <- data %>%
-        filter(year == input$map_year,month == input$map_month,breau == input$map_breau)
+        filter(year == y1,month == m1,breau == input$map_breau)
       }else{
       fdata <- data %>%
-        filter(year == input$map_year,month == input$map_month,breau == input$map_breau,type == input$map_type)
-      }#filter map & choice zoom
+        filter(year == y1,month == m1,breau == input$map_breau,type == input$map_type)
+      }#過濾地圖資料
     
       getmap <- get_googlemap(center = c(lon = mean(fdata$lon),lat = mean(fdata$lat)),zoom=zoom(),maptype = "roadmap")
+      #根據點位中心
       ggmap(getmap,extent = "device",ylab = "lat",xlab = "lon",maprange=FALSE) +
         geom_point(data = fdata,colour = "darkred", pch=16, cex= 2.5,alpha = 1) +
         stat_density2d(data = fdata, aes(x = lon, y = lat,  fill = ..level.., alpha = ..level..),size = 0.01, geom = 'polygon')+
@@ -47,14 +40,32 @@ shinyServer(function(input, output) {
       })
   
   breau_plot <- reactive({
+    ym <- as.numeric(input$anb_year)
+    y1 <- round(ym / 100)
+    m1 <- ym %% 100
     data %>% 
-      filter(year == input$anb_year,month == input$anb_month) %>% 
+      filter(year == y1,month == m1) %>% 
       group_by(breau,type) %>%
       summarise(count = n()) %>%
       ggvis(~breau,~count) %>%
-      layer_bars(fill = ~type,width = 0.5)
+      layer_bars(fill = ~type,width = 0.5) 
   })
   
   breau_plot %>% bind_shiny("breau_plot")
+  
+  output$Data <- renderTable({
+    ym <- as.numeric(input$data_year)
+    y1 <- round(ym / 100)
+    m1 <- ym %% 100
+    if(input$data_breau != "All" & input$data_type != "All"){
+      data %>% filter(year == y1,month == m1,breau == input$data_breau,type == input$data_type)
+    }else if(input$data_breau !="All" & input$data_type == "All"){
+      data %>% filter(year == y1,month == m1,breau == input$data_breau)
+    }else if(input$data_breau =="All" & input$data_type != "All"){
+      data %>% filter(year == y1,month == m1,type == input$data_type)
+    }else{
+      data %>% filter(year == y1,month == m1)
+    }
+  })
 
 })
